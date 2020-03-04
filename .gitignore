@@ -1,0 +1,7 @@
+venv 
+/venv
+env
+/env
+geckodriver.log
+/__pycache__
+__pycache__
