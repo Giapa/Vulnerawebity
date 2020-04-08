@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
-from soup_methods import find_links, find_buttons
+from soup_methods import find_links, find_buttons, find_inputs
+import json
 
 global queue
 global crawled
@@ -28,7 +29,7 @@ def check_urls():
     with open('checklist.txt','r') as file:
         lines = file.readlines()
     for line in lines:
-        page = requests.get('https://juice-shop.herokuapp.com/#/'+line)
+        page = requests.get('https://giapa.github.io/'+line)
         print(page.content.decode('utf-8'))
 
 if __name__ == '__main__':
@@ -36,7 +37,14 @@ if __name__ == '__main__':
     crawled = set() 
     site = input('Give site full url: ')
     queue.append('/')
-    if not has_ajax(site):
+    if  not has_ajax(site):
         search(site)
+        for page in crawled:
+            if page!='/':
+                newlink=requests.get(page)
+                soup=BeautifulSoup(newlink.content,'html.parser')
+                if  find_inputs(soup):
+                    print('inputs found at page:',page)
     else:
-        ans = input('We found ajax calls so we need a different approach. Would you like to get the big guns? [y,n]')
+        ans=input('We found ajax calls so we need a different approach. Would you like to get big guns? [y,n]')    
+   
