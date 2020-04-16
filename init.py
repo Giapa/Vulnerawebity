@@ -18,7 +18,7 @@ class Actions():
 
 def initialize():
     opts = Options()
-    opts.add_argument("--headless")
+    #opts.add_argument("--headless")
     opts.add_argument("--ignore-certificate-error")
     opts.add_argument("--incognito")
     opts.add_argument("--start-maximized")
