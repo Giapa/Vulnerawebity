@@ -28,6 +28,7 @@ def available_links(driver,site):
             available.add(queue.pop(0))
         else:
             queue.pop(0)
+    print('Finished scanning for available links')
 
 def check_form_val(driver,site):
     vulnerable_links=[]
@@ -37,10 +38,8 @@ def check_form_val(driver,site):
         page = driver.page_source
         soup = BeautifulSoup(page,'html.parser')
         if find_inputs(soup):
-            print(f'{site}{link} has inputs you can exploit')
             vulnerable_links.append(link)
-        else:
-            print(f'{site}{link} has no input form to exploit')
+    print('Finished scanning for inputs\n')
     return vulnerable_links
 
 
@@ -97,16 +96,22 @@ if __name__ == '__main__':
     available.add('/')
 
     site = input('Give site full url: ')
+    print('Finding available urls of the given site')
 
     available_links(driver,site)
 
-    print('Available Ulrs:')
+    print('Available Urls:')
     for link in available:
         print(f'---{link}')
 
-    print('----------------- \n')
+    print('\n----------------- \n')
 
     vulnerable_links = check_form_val(driver,site)
+    for vul_link in vulnerable_links:
+        if 'login' in vul_link or 'signup' in vul_link:
+            print(f'{vul_link} is probably vulnerable to Sql Injection')
+        else:
+            print(f'{vul_link} is probably vurnerable to XSS attack')
 
    # if '/login/' in  vulnerable_links: #check if link has login 
    #     loginsqlinjection(site,'/login/',driver)
@@ -114,6 +119,6 @@ if __name__ == '__main__':
     response = xssattack(driver,available)
 
     if response is None:
-        print('Xss attacks failed')
+       print('Xss attacks failed')
     else:
-        print('There are available xss attacks')
+       print('There are available xss attacks')

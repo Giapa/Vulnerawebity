@@ -4,7 +4,7 @@ def find_links(soup,domain,queue,crawled):
     links = soup.find_all('a',{'href':True})
     for a in links:
         href = a['href'] 
-        if domain in href or '#/' in href: 
+        if domain in href or '#/' in href or '.html' in href: 
             if href not in crawled and href not in queue and href not in new_list: 
                 new_list.append(href)
     return new_list
