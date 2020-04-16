@@ -18,10 +18,10 @@ class Actions():
 
 def initialize():
     opts = Options()
-    #opts.add_argument("--headless")
-    opts.add_argument("-ignore-certificate-error")
-    opts.add_argument("-incognito")
-    opts.add_argument("-start-maximized")
+    opts.add_argument("--headless")
+    opts.add_argument("--ignore-certificate-error")
+    opts.add_argument("--incognito")
+    opts.add_argument("--start-maximized")
     opts.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36")
 
     driver = webdriver.Firefox(firefox_options=opts)

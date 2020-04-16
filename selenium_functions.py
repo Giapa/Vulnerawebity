@@ -28,7 +28,6 @@ def available_links(driver,site):
             available.add(queue.pop(0))
         else:
             queue.pop(0)
-    print('Finished scanning for available links')
 
 def check_form_val(driver,site):
     vulnerable_links=[]
@@ -39,7 +38,6 @@ def check_form_val(driver,site):
         soup = BeautifulSoup(page,'html.parser')
         if find_inputs(soup):
             vulnerable_links.append(link)
-    print('Finished scanning for inputs\n')
     return vulnerable_links
 
 
@@ -62,29 +60,75 @@ def loginsqlinjection(site,link,driver): #check for sql injection
 
 def xssattack(driver,links):
     attacks = ['<script>alert("1")</script>','<iframe src="javascript:alert(`1`)">']
+    print('\nChecking for successful XSS attacks')
+    flag = False
     for link in links:
         driver.get(f'{site}{link}')
         soup = BeautifulSoup(driver.page_source,'html.parser')
         inp = soup.find('input')
+        input_found = False
         try:
-            class_name = inp['class']
-            input_form = driver.find_element_by_class_name(class_name)
+            if isinstance(inp,list):
+                attribute = inp['class'][0]
+            else:
+                attribute = inp['class']
+            input_form = driver.find_element_by_class_name(attribute)
+            input_form.click()
+            input_found = True
         except:
-            id_name = inp['id']
-            input_form = driver.find_element_by_id(id_name)
-
-        flag = False
-        driver.execute_script("arguments[0].click();", input_form)
-        for attack in attacks:
-            input_form.send_keys(attack)
-            try:
-                alert = WebDriverWait(driver,2).until(EC.alert_is_present())
-                alert.accept()
-                flag = True
-            except:
-                pass
-        if flag == True:
-            return link
+            pass
+        
+        try:
+            if isinstance(inp,list):
+                attribute = inp['id'][0]
+            else:
+                attribute = inp['id']
+            input_form = driver.find_element_by_id(attribute)
+            input_form.click()
+            input_found = True
+        except:
+            pass
+        
+        try:
+            input_form = driver.find_elements_by_xpath("//*[contains(text(), 'search')]")
+            if isinstance(input_form,list):
+                for i in input_form:
+                    try:
+                        i.click()
+                        input_found = True
+                        input_id = soup.find('input')['id']
+                        input_form = driver.find_element_by_id(input_id)
+                        break
+                    except:
+                        pass
+            else:
+                input_form.click()
+                input_found = True
+        except:
+            pass
+        if input_found == True:
+            for attack in attacks:
+                if isinstance(input_form,list):
+                    for i in input_form:
+                        try:
+                            input_form.send_keys(attack)
+                            input_form.send_keys(Keys.RETURN)
+                            break
+                        except:
+                            pass
+                else:
+                    input_form.send_keys(attack)
+                    input_form.send_keys(Keys.RETURN)
+                try:
+                    alert = WebDriverWait(driver,2).until(EC.alert_is_present())
+                    alert.accept()
+                    flag = True
+                except:
+                    pass
+                if flag == True:
+                    return True
+        else:
+            continue 
     return None
 
 if __name__ == '__main__':
@@ -96,16 +140,14 @@ if __name__ == '__main__':
     available.add('/')
 
     site = input('Give site full url: ')
-    print('Finding available urls of the given site')
+    print('\nFinding available urls of the given site')
 
     available_links(driver,site)
 
     print('Available Urls:')
     for link in available:
         print(f'---{link}')
-
-    print('\n----------------- \n')
-
+    print('\n')
     vulnerable_links = check_form_val(driver,site)
     for vul_link in vulnerable_links:
         if 'login' in vul_link or 'signup' in vul_link:
@@ -119,6 +161,6 @@ if __name__ == '__main__':
     response = xssattack(driver,available)
 
     if response is None:
-       print('Xss attacks failed')
+       print('\nXss attacks failed')
     else:
-       print('There are available xss attacks')
+       print('\nThere are available xss attacks')
