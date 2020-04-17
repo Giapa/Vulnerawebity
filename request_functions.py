@@ -2,11 +2,11 @@ import requests
 from bs4 import BeautifulSoup
 from soup_methods import find_links, find_buttons
 
-global queue
-global crawled
-
 #---Request methods---
 def search(site): 
+    queue = list() 
+    crawled = set() 
+    queue.append('/')
     domain = site.split('.')[0]
     while len(queue) != 0 : 
         link = queue[0] 
@@ -15,7 +15,7 @@ def search(site):
         queue.extend(find_buttons(soup,queue,crawled))
         queue.extend(find_links(soup,domain,queue,crawled))
         crawled.add(queue.pop(0))
-    print(f'crawled: {crawled}')
+    return crawled
 
 def has_ajax(site):
     page = requests.get(site)
@@ -23,20 +23,3 @@ def has_ajax(site):
         return True
     else:
         return False
-
-def check_urls():
-    with open('checklist.txt','r') as file:
-        lines = file.readlines()
-    for line in lines:
-        page = requests.get('https://juice-shop.herokuapp.com/#/'+line)
-        print(page.content.decode('utf-8'))
-
-if __name__ == '__main__':
-    queue = list() 
-    crawled = set() 
-    site = input('Give site full url: ')
-    queue.append('/')
-    if not has_ajax(site):
-        search(site)
-    else:
-        ans = input('We found ajax calls so we need a different approach. Would you like to get the big guns? [y,n]')

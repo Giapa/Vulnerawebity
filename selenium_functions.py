@@ -2,15 +2,13 @@ from time import sleep
 from random import uniform
 from soup_methods import find_links, find_buttons, find_inputs
 from bs4 import BeautifulSoup
-from init import initialize
-from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
 #Find available links 
-def available_links(driver,site):
+def available_links(driver,site,queue,available):
     #Get domain
     domain = site.split('.')[0]
     #Visit home
@@ -40,7 +38,7 @@ def available_links(driver,site):
         else:
             queue.pop(0)
 #Check if the link has an input form
-def check_form_val(driver,site):
+def check_form_val(driver,available,site):
     vulnerable_links=[]
     #Loop through available links
     for link in available:
@@ -73,7 +71,7 @@ def loginsqlinjection(site,link,driver): #check for sql injection
     else:
         print("login failed")
 
-def xssattack(driver,links):
+def xssattack(driver,site,links):
     #Checking for 
     attacks = ['<script>alert("1")</script>','<iframe src="javascript:alert(`1`)">']
     print('\nChecking for successful XSS attacks')
@@ -174,43 +172,3 @@ def xssattack(driver,links):
             continue 
     #Return None if nothing was found
     return None
-
-if __name__ == '__main__':
-    #Basic queue for crawling
-    queue = list()
-    #Set of available links
-    available = set()
-    #Init webdriver
-    driver = initialize()
-    #Init list an set
-    queue.append('/')
-    available.add('/')
-    #Get website
-    site = input('Give site full url: ')
-    print('\nFinding available urls of the given site')
-    #Find available links
-    available_links(driver,site)
-    #Print available links
-    print('Available Urls:')
-    for link in available:
-        print(f'---{link}')
-    print('\n')
-    #Check for inputs
-    vulnerable_links = check_form_val(driver,site)
-    #Print threat level of links
-    for vul_link in vulnerable_links:
-        if 'login' in vul_link or 'signup' in vul_link:
-            print(f'{vul_link} is probably vulnerable to Sql Injection')
-        else:
-            print(f'{vul_link} is probably vurnerable to XSS attack')
-
-   # if '/login/' in  vulnerable_links: #check if link has login 
-   #     loginsqlinjection(site,'/login/',driver)
-
-    #Get results of xss
-    response = xssattack(driver,available)
-    #Print results of xss
-    if response is None:
-       print('\nXss attacks failed')
-    else:
-       print('\nThere are available xss attacks')
