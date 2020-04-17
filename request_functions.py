@@ -3,11 +3,11 @@ from bs4 import BeautifulSoup
 from soup_methods import find_links, find_buttons, find_inputs
 import json
 
-global queue
-global crawled
-
 #---Request methods---
 def search(site): 
+    queue = list() 
+    crawled = set() 
+    queue.append('/')
     domain = site.split('.')[0]
     while len(queue) != 0 : 
         link = queue[0] 
@@ -16,7 +16,7 @@ def search(site):
         queue.extend(find_buttons(soup,queue,crawled))
         queue.extend(find_links(soup,domain,queue,crawled))
         crawled.add(queue.pop(0))
-    print(f'crawled: {crawled}')
+    return crawled
 
 def has_ajax(site):
     page = requests.get(site)
@@ -24,6 +24,7 @@ def has_ajax(site):
         return True
     else:
         return False
+<<<<<<< HEAD
 
 def check_urls():
     with open('checklist.txt','r') as file:
@@ -48,3 +49,5 @@ if __name__ == '__main__':
     else:
         ans=input('We found ajax calls so we need a different approach. Would you like to get big guns? [y,n]')    
    
+=======
+>>>>>>> 43724b80f14baed8595887bace2e7b5b687c40b4

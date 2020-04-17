@@ -1,8 +1,0 @@
-/login/
-/signup/
-/signin/
-/search/
-/home/
-/contact/
-/profile/
-/administration/
