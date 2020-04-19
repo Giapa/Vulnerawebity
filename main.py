@@ -1,12 +1,40 @@
 from request_functions import search,has_ajax
 from selenium_functions import available_links,check_form_val,loginsqlinjection,xssattack
 from init import initialize
-
+from bs4 import BeautifulSoup
+from soup_methods import find_inputs
+#Run it with different ip address 
+def run_proxies():
+    #List for proxies 
+    proxies=list()
+    #Open the file
+    with open(input('\nGive the full path: '),'r') as file:
+        lines = file.readlines()
+        for line in lines:
+            #For each ip-proxie
+            line=line.split('\n')[0]
+            proxies.append(line)
+    return proxies
+    
 #For static sites
 def run_static(site):
     crawled = search(site)
     for link in crawled:
         print(f'Found available link: {link}')
+        #for each new link
+        new_link=site+link
+        soup= BeautifulSoup(new_link.content,'html.parser')
+        if (find_inputs(soup)):
+            print('\nInput found at this page')
+            #Find all inputs
+            inputs = soup.find_all('input')
+            if 'login' in inputs or 'signup' in inputs:
+                print(f'{new_link} is probably vulnerable to Sql Injection')
+            else:
+                print(f'{new_link} is probably vurnerable to XSS attack')
+
+        else:
+            print('\nNo inputs found at this page')
 
 #For sites with javascript enabled
 def run_dynamic(site):
