@@ -37,13 +37,13 @@ def run_static(site):
             print('\nNo inputs found at this page')
 
 #For sites with javascript enabled
-def run_dynamic(site):
+def run_dynamic(site,proxy):
     #Basic queue for crawling
     queue = list()
     #Set of available links
     available = set()
     #Init webdriver
-    driver = initialize()
+    driver = initialize(proxy)
     #Init list an set
     queue.append('/')
     available.add('/')
@@ -78,12 +78,17 @@ def run_dynamic(site):
 
 if __name__ == "__main__":
     site = input('Give site url: ')
+    yes = ['Yes','yes','Y','y']
+    ansP=input('\nDo you want to use proxies?')
     if not has_ajax(site):
         run_static(site)
     else:
         ans = input('\nWe found ajax calls so we need a different approach. Would you like to get the big guns? [y,n]: ')
-        yes = ['Yes','yes','Y','y']
-        if ans in yes:
-            run_dynamic(site)
+        if ans in yes and ansP in yes:
+            proxies=run_proxies()
+                #for the first proxy
+            run_dynamic(site,proxies[0])
+        elif ans in yes:
+                run_dynamic(site,None)
         else:
             print('Thank you for using our too\n Goodbye!')
