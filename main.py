@@ -1,14 +1,13 @@
-from request_functions import search,has_ajax
-from selenium_functions import available_links,check_form_val,loginsqlinjection,xssattack
-from init import initialize
+from functions.request_functions import search,has_ajax
+from functions.selenium_functions import available_links,check_form_val,loginsqlinjection,xssattack
+from functions.init import initialize
 from bs4 import BeautifulSoup
-from soup_methods import find_inputs
+from functions.soup_methods import find_inputs
 
-#Run it with different ip address 
+#Run it with different ip address
 def get_proxies():
-    yes = ['Yes','yes','Y','y']
     ansP=input('\nDo you want to use proxies?')
-    if ansP in yes: 
+    if ansP in yes:
         #Open the file
         with open(input('\nGive the full path: '),'r') as file:
             lines = file.readline()
@@ -16,7 +15,7 @@ def get_proxies():
             return proxy
     else:
         return None
-    
+
 #For static sites
 def run_static(site,proxy):
     crawled = search(site,proxy)
@@ -65,7 +64,7 @@ def run_dynamic(site,proxy):
         else:
             print(f'{vul_link} is probably vurnerable to XSS attack')
 
-   # if '/login/' in  vulnerable_links: #check if link has login 
+   # if '/login/' in  vulnerable_links: #check if link has login
    #     loginsqlinjection(site,'/login/',driver)
 
     #Get results of xss
@@ -78,6 +77,7 @@ def run_dynamic(site,proxy):
 
 
 if __name__ == "__main__":
+    yes = ['Yes','yes','Y','y']
     site = input('Give site url: ')
     proxy=get_proxies()
     if not has_ajax(site,proxy):
@@ -87,4 +87,4 @@ if __name__ == "__main__":
         if ans in yes:
             run_dynamic(site,proxy)
         else:
-            print('Thank you for using our too\n Goodbye!')            
+            print('Thank you for using our too\n Goodbye!')

