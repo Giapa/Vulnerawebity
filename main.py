@@ -3,18 +3,19 @@ from selenium_functions import available_links,check_form_val,loginsqlinjection,
 from init import initialize
 from bs4 import BeautifulSoup
 from soup_methods import find_inputs
+
 #Run it with different ip address 
-def run_proxies():
-    #List for proxies 
-    proxies=list()
-    #Open the file
-    with open(input('\nGive the full path: '),'r') as file:
-        lines = file.readlines()
-        for line in lines:
-            #For each ip-proxie
-            line=line.split('\n')[0]
-            proxies.append(line)
-    return proxies
+def get_proxies():
+    yes = ['Yes','yes','Y','y']
+    ansP=input('\nDo you want to use proxies?')
+    if ansP in yes: 
+        #Open the file
+        with open(input('\nGive the full path: '),'r') as file:
+            lines = file.readline()
+            proxy=line.split('\n')[0]
+            return proxy
+    else:
+        return None
     
 #For static sites
 def run_static(site,proxy):
@@ -78,25 +79,12 @@ def run_dynamic(site,proxy):
 
 if __name__ == "__main__":
     site = input('Give site url: ')
-    yes = ['Yes','yes','Y','y']
-    ansP=input('\nDo you want to use proxies?')
-    if ansP in yes: 
-        proxies=run_proxies()
-        #for first proxy only
-        if not has_ajax(site,proxies[0]):
-            run_static(site,proxies[0])
-        else:
-            ans = input('\nWe found ajax calls so we need a different approach. Would you like to get the big guns? [y,n]: ')
-            if ans in yes:
-                run_dynamic(site,proxies[0])
-            else:
-                print('Thank you for using our too\n Goodbye!')            
+    proxy=get_proxies()
+    if not has_ajax(site,proxy):
+        run_static(site,proxy)
     else:
-        if not has_ajax(site,None):
-            run_static(site,None)
+        ans = input('\nWe found ajax calls so we need a different approach. Would you like to get the big guns? [y,n]: ')
+        if ans in yes:
+            run_dynamic(site,proxy)
         else:
-            ans = input('\nWe found ajax calls so we need a different approach. Would you like to get the big guns? [y,n]: ')
-            if ans in yes:
-                run_dynamic(site,None)
-            else:
-                print('Thank you for using our too\n Goodbye!')
+            print('Thank you for using our too\n Goodbye!')            
