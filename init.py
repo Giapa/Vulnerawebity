@@ -16,7 +16,7 @@ class Actions():
     def refresh(self, driver):
         driver.find_element_by_tag_name('body').send_keys(Keys.F5)
 
-def initialize(proxy=None):
+def initialize(proxy):
     opts = Options()
     #opts.add_argument("--headless")
     opts.add_argument("--ignore-certificate-error")
