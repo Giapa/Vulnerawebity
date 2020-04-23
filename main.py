@@ -1,21 +1,50 @@
 from request_functions import search,has_ajax
 from selenium_functions import available_links,check_form_val,loginsqlinjection,xssattack
 from init import initialize
+from bs4 import BeautifulSoup
+from soup_methods import find_inputs
 
+#Run it with different ip address 
+def get_proxies():
+    yes = ['Yes','yes','Y','y']
+    ansP=input('\nDo you want to use proxies?')
+    if ansP in yes: 
+        #Open the file
+        with open(input('\nGive the full path: '),'r') as file:
+            lines = file.readline()
+            proxy=line.split('\n')[0]
+            return proxy
+    else:
+        return None
+    
 #For static sites
-def run_static(site):
-    crawled = search(site)
+def run_static(site,proxy):
+    crawled = search(site,proxy)
     for link in crawled:
         print(f'Found available link: {link}')
+        #for each new link
+        new_link=site+link
+        soup= BeautifulSoup(new_link.content,'html.parser')
+        if (find_inputs(soup)):
+            print('\nInput found at this page')
+            #Find all inputs
+            inputs = soup.find_all('input')
+            if 'login' in inputs or 'signup' in inputs:
+                print(f'{new_link} is probably vulnerable to Sql Injection')
+            else:
+                print(f'{new_link} is probably vurnerable to XSS attack')
+
+        else:
+            print('\nNo inputs found at this page')
 
 #For sites with javascript enabled
-def run_dynamic(site):
+def run_dynamic(site,proxy):
     #Basic queue for crawling
     queue = list()
     #Set of available links
     available = set()
     #Init webdriver
-    driver = initialize()
+    driver = initialize(proxy)
     #Init list an set
     queue.append('/')
     available.add('/')
@@ -50,12 +79,12 @@ def run_dynamic(site):
 
 if __name__ == "__main__":
     site = input('Give site url: ')
-    if not has_ajax(site):
-        run_static(site)
+    proxy=get_proxies()
+    if not has_ajax(site,proxy):
+        run_static(site,proxy)
     else:
         ans = input('\nWe found ajax calls so we need a different approach. Would you like to get the big guns? [y,n]: ')
-        yes = ['Yes','yes','Y','y']
         if ans in yes:
-            run_dynamic(site)
+            run_dynamic(site,proxy)
         else:
-            print('Thank you for using our too\n Goodbye!')
+            print('Thank you for using our too\n Goodbye!')            
