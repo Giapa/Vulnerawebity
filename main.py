@@ -17,8 +17,8 @@ def run_proxies():
     return proxies
     
 #For static sites
-def run_static(site):
-    crawled = search(site)
+def run_static(site,proxy):
+    crawled = search(site,proxy)
     for link in crawled:
         print(f'Found available link: {link}')
         #for each new link
@@ -80,15 +80,23 @@ if __name__ == "__main__":
     site = input('Give site url: ')
     yes = ['Yes','yes','Y','y']
     ansP=input('\nDo you want to use proxies?')
-    if not has_ajax(site):
-        run_static(site)
-    else:
-        ans = input('\nWe found ajax calls so we need a different approach. Would you like to get the big guns? [y,n]: ')
-        if ans in yes and ansP in yes:
-            proxies=run_proxies()
-                #for the first proxy
-            run_dynamic(site,proxies[0])
-        elif ans in yes:
-                run_dynamic(site,None)
+    if ansP in yes: 
+        proxies=run_proxies()
+        #for first proxy only
+        if not has_ajax(site,proxies[0]):
+            run_static(site,proxies[0])
         else:
-            print('Thank you for using our too\n Goodbye!')
+            ans = input('\nWe found ajax calls so we need a different approach. Would you like to get the big guns? [y,n]: ')
+            if ans in yes:
+                run_dynamic(site,proxies[0])
+            else:
+                print('Thank you for using our too\n Goodbye!')            
+    else:
+        if not has_ajax(site,None):
+            run_static(site,None)
+        else:
+            ans = input('\nWe found ajax calls so we need a different approach. Would you like to get the big guns? [y,n]: ')
+            if ans in yes:
+                run_dynamic(site,None)
+            else:
+                print('Thank you for using our too\n Goodbye!')
