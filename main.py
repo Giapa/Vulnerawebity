@@ -74,6 +74,7 @@ def run_dynamic(site,proxy):
        print('\nXss attacks failed')
     else:
        print('\nThere are available xss attacks')
+    driver.quit()
 
 
 if __name__ == "__main__":
