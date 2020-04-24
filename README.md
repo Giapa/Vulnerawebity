@@ -5,11 +5,11 @@
 ### First you need to install some dependancies:
 
 ```python
-pip3 install selenium
+pip install selenium
 ```
 
 ```python
-pip3 install bs4
+pip install bs4
 ```
 
 ```python 
