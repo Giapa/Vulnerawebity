@@ -2,8 +2,8 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 
+#Class that contains basic actions
 class Actions():
-
     def scroll_end(self, driver):
         driver.find_element_by_tag_name('body').send_keys(Keys.END)
 
@@ -16,15 +16,22 @@ class Actions():
     def refresh(self, driver):
         driver.find_element_by_tag_name('body').send_keys(Keys.F5)
 
+#Initialization class for webdriver
 def initialize(proxy):
+    
+    #Open options
     opts = Options()
-    #opts.add_argument("--headless")
+    opts.add_argument("--headless")
     opts.add_argument("--ignore-certificate-error")
     opts.add_argument("--incognito")
     opts.add_argument("--start-maximized")
     opts.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36")
+
+    #Check for proxy
     if proxy is not None:
         opts.add_argument('--proxy-server={proxy}')
+    #Start webdriver
+    
     driver = webdriver.Firefox(firefox_options=opts)
 
     return driver
